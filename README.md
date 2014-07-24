@@ -1,10 +1,15 @@
 # clj_torrent
 
-FIXME: description
+The beginnings of a BitTorrent client in Clojure.
+
+## TODO
+
 
 ## Installation
 
-Download from http://example.com/FIXME.
+```
+lein deps
+```
 
 ## Usage
 
