@@ -6,6 +6,6 @@
 (defn -main
   "I don't do a whole lot ... yet."
   [& args]
-  (let [filenames ["examples/flagfromserver.torrent" "examples/karl_marx.torrent"]]
+  (let [filenames ["examples/flagfromserver.torrent"]]
     (log/info "Hello, welcome to Georgi's awesome Clojure BitTorrent client")
     (client/start! (set filenames))))
