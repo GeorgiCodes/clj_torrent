@@ -16,7 +16,6 @@
 ;;     (random-byte-array)))
 
 ;; (URLEncoder/encode "123 aslk")
-(take 20 (.toString (generate-peer-id)))
 (URLEncoder/encode "GK121212121212121212")
 
 (generate-peer-id)

@@ -9,6 +9,7 @@
                  [http-kit "2.1.16"]
                  [ring/ring-codec "1.0.0"]
                  [pandect "0.3.4"]
+                 [clj-http "0.9.2"]
                  [org.clojure/tools.logging "0.3.0"]
                  [log4j/log4j "1.2.17"]]
   :main ^:skip-aot clj-torrent.core
