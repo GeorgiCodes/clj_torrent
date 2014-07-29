@@ -14,4 +14,6 @@
                  [log4j/log4j "1.2.17"]]
   :main ^:skip-aot clj-torrent.core
   :target-path "target/%s"
-  :profiles {:uberjar {:aot :all}})
+  :profiles {:uberjar {:aot :all}
+             :dev {:plugins [[lein-midje "3.1.3"]]
+                   :dependencies [[midje "1.6.3"]]}})

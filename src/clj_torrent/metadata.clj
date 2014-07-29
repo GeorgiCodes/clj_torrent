@@ -1,5 +1,4 @@
 (ns clj-torrent.metadata
-  (:use clj-torrent.utils)
   (:import [java.security MessageDigest])
   (:require [bencode.bencode :refer [decode encode]]
             [clojure.tools.logging :as log]

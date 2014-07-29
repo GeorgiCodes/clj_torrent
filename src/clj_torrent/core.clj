@@ -1,11 +1,11 @@
 (ns clj-torrent.core
   (:gen-class)
-  (:require [clj-torrent.client :as client]
-            [clojure.tools.logging :as log]))
+  (:use clj-torrent.torrent-file)
+  (:require [clojure.tools.logging :as log]))
 
 (defn -main
-  "I don't do a whole lot ... yet."
+  "Takes in a list of filenames and starts downloading via the BitTorrent protocol"
   [& args]
   (let [filenames ["examples/flagfromserver.torrent"]]
     (log/info "Hello, welcome to Georgi's awesome Clojure BitTorrent client")
-    (client/start! (set filenames))))
+    (start! (set filenames))))
