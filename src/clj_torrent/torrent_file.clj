@@ -2,17 +2,15 @@
   (:import (java.util UUID)
            [java.net URLEncoder])
   (:require [clj-torrent.metadata :as metadata]
+            [clj-torrent.utils :refer :all]
             [org.httpkit.client :as http]
             [clojure.tools.logging :as log]
             [bencode.core :refer [bdecode]]
-            [bencode.bencode :refer [decode encode]]))
+            [bencode.bencode :refer [decode encode]]
+            [clojure.string :as string]))
 
 (def peer-id-length 20)
 (def peer-prefix "GK")
-
-;; (take 4 "Bl\xAD\x10\x00\x00`~h\xDB\xEA9")
-;; (map (comp byte int) "66")
-
 
 (defn generate-peer-id []
   (take peer-id-length (.toString (UUID/randomUUID))))
@@ -22,31 +20,50 @@
 
 (defn parse-peers [peers]
   "Takes in a byte array and parses it for ip addresses and ports"
-  )
+  (into [] (map (fn [b] (int b)) peers)))
 
-;; (into [] (map (fn [b] (int b)) peers))
+(defn apply-if
+  "Applies f to val if (pred val) is truthy. Otherwise,
+  returns val."
+  [pred f val]
+  (if (pred val) (f val) val))
+
+(defn to-ip-and-port
+  [s]
+  (let [[ip [a b]] (partition-all 4 (map int s))]
+    {:ip (string/join "." ip)
+     :port (+ b (* 256 a))}))
+
+(defn prep-peers
+  [peers]
+  (apply-if (complement vector?) #(mapv to-ip-and-port (partition 6 %)) peers))
 
 (defn parse-tracker-response [response]
-  (log/info "Parsing tracker response" response)
-  (let [decoded (decode response)
-        peers (parse-peers (get decoded "peers"))]
-    (println decoded)
-    (println (get decoded "peers"))
+  (log/info "Parsing tracker response")
+  (let [decoded (bdecode response {:str-keys? false :raw-keys ["peers"]})
+        peers (parse-peers (:peers decoded))
+        parsed-peers (prep-peers (:peers decoded))]
+    (log/info decoded)
+    (println peers)
+    (println parsed-peers)
+    (class parsed-peers )
+    (:ip parse-peers)
+    (println "who is here")
     ))
 
 (defn init-tracker-url [metadata]
   "Constructs a URL to connect to a tracker with correct encoding of info_hash"
-  (str (:announce metadata) "?info_hash=" (URLEncoder/encode (String. (:info-hash metadata)) "ISO-8859-1")
+  (str (:announce metadata) "?info_hash=" (percent-encode (hexify (:info-hash metadata)))
        "&peer_id=" "GK121212121212121212" "&left=" (:length metadata)))
 
 (defn connect-to-tracker [metadata]
   (log/info "Connecting to tracker" (init-tracker-url metadata))
   (let [{:keys [status headers body error] :as resp}
-        @(http/get (init-tracker-url metadata))]
+        @(http/get (init-tracker-url metadata) {:as :byte-array})]
     (if error
       (log/error "Failed to connect to tracker: " error)
       (do
-        (log/info "HTTP GET success: " body)
+        (log/info "HTTP GET success: ")
         (parse-tracker-response body)))))
 
 (defn connect-to-trackers [metadata-list]
