@@ -5,8 +5,8 @@
         clj-torrent.metadata
         clj-torrent.utils))
 
-
-
+(generate-peer-id)
+(peer-id)
 ;; %2B%15%CA%2B%FDH%CD%D7m9%ECU%A3%AB%1B%8AW%18%0A%09
 
 ;; (hexify (:info-hash sml-torrent))
@@ -26,3 +26,6 @@
 
 ;; (percent-encode "2b15ca2bfd48cdd76d39ec55a3ab1b8a57180a09")
 
+;; bytes in java/clojure
+Byte/MAX_VALUE
+(+ Byte/MIN_VALUE 256)

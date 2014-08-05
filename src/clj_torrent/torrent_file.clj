@@ -10,51 +10,48 @@
             [clojure.string :as string]))
 
 (def peer-id-length 20)
-(def peer-prefix "GK")
+(def peer-prefix "GK-")
 
+;; (def torrent-state (atom {:peer-id (generate-peer-id)
+;;                           :downloaded-so-far 0}))
 (defn generate-peer-id []
-  (take peer-id-length (.toString (UUID/randomUUID))))
+  (str peer-prefix (clojure.string/join (take (- peer-id-length (count peer-prefix)) (.toString (UUID/randomUUID))))))
+
+(def peer-id (generate-peer-id))
 
 (defn parse-torrent-files [filenames]
   (map #(metadata/init-metadata %) filenames))
 
+(defn parse-peer-bytes [peers]
+  "Takes in a byte array and parses it for the ints that will make up IP addresses.
+  Java bytes are signed which means more maths for those < 0"
+  (into [] (map
+            (fn [b] (let [int-val (int b)]
+                      (if (< int-val 0)
+                        (+ 256 int-val)
+                        int-val)))
+            peers)))
+
+(defn to-ip-and-port [input]
+  (let [[a b] (partition-all 4 input)]
+    {:ip (string/join "." a)
+     :port (+ (* 256 (first b)) (last b))}))
+
 (defn parse-peers [peers]
-  "Takes in a byte array and parses it for ip addresses and ports"
-  (into [] (map (fn [b] (int b)) peers)))
-
-(defn apply-if
-  "Applies f to val if (pred val) is truthy. Otherwise,
-  returns val."
-  [pred f val]
-  (if (pred val) (f val) val))
-
-(defn to-ip-and-port
-  [s]
-  (let [[ip [a b]] (partition-all 4 (map int s))]
-    {:ip (string/join "." ip)
-     :port (+ b (* 256 a))}))
-
-(defn prep-peers
-  [peers]
-  (apply-if (complement vector?) #(mapv to-ip-and-port (partition 6 %)) peers))
+  (map to-ip-and-port (partition 6 (parse-peer-bytes peers))))
 
 (defn parse-tracker-response [response]
   (log/info "Parsing tracker response")
   (let [decoded (bdecode response {:str-keys? false :raw-keys ["peers"]})
-        peers (parse-peers (:peers decoded))
-        parsed-peers (prep-peers (:peers decoded))]
+        peers (parse-peers (:peers decoded))]
+    (println "Parsed peer results")
     (log/info decoded)
-    (println peers)
-    (println parsed-peers)
-    (class parsed-peers )
-    (:ip parse-peers)
-    (println "who is here")
-    ))
+    (println peers)))
 
 (defn init-tracker-url [metadata]
-  "Constructs a URL to connect to a tracker with correct encoding of info_hash"
+  "Constructs a URL to connect to a tracker with correct encoding of info_hash, peer_id & length"
   (str (:announce metadata) "?info_hash=" (percent-encode (hexify (:info-hash metadata)))
-       "&peer_id=" "GK121212121212121212" "&left=" (:length metadata)))
+       "&peer_id=" peer-id "&left=" (:length metadata)))
 
 (defn connect-to-tracker [metadata]
   (log/info "Connecting to tracker" (init-tracker-url metadata))
@@ -73,6 +70,3 @@
 (defn start! [filenames]
   (let [metadata-list (parse-torrent-files filenames)]
     (connect-to-trackers metadata-list)))
-
-;; d8:completei0e10:downloadedi0e10:incompletei1e8:intervali1892e12:min intervali946e5:peers6:J\324\267\272\000\000e #clojure
-;; d8:completei1e10:downloadedi2e10:incompletei1e8:intervali1749e12:min intervali874e5:peers12:J\324\267\272\000\000`~h\333\3529e #ruby

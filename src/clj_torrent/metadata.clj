@@ -18,13 +18,6 @@
       (conj [] (get info "name"))
       (into [] (map (fn [file] (clojure.string/join "/" (get file "path"))) files)))))
 
-;; (defn sha1-info-hash
-;;   "Returns the byte array of the torrent info hash."
-;;   [metainfo]
-;;   (let [enc (encode (get metainfo "info"))
-;;         dig (MessageDigest/getInstance "SHA1")]
-;;     (.digest dig enc)))
-
 (defn init-metadata
   [filename]
   (let [metadata (parse-metainfo-file filename)

@@ -7,11 +7,9 @@
                  [com.zachallaun/bencode "0.1.1-SNAPSHOT"]
                  [bencode "0.2.5"]
                  [http-kit "2.1.16"]
-                 [ring/ring-codec "1.0.0"]
-                 [pandect "0.3.4"]
-                 [clj-http "0.9.2"]
                  [org.clojure/tools.logging "0.3.0"]
-                 [log4j/log4j "1.2.17"]]
+                 [log4j/log4j "1.2.17"]
+                 [org.clojure/core.async "0.1.303.0-886421-alpha"]]
   :main ^:skip-aot clj-torrent.core
   :target-path "target/%s"
   :profiles {:uberjar {:aot :all}
