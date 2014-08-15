@@ -2,40 +2,10 @@
 
 The beginnings of a BitTorrent client in Clojure.
 
-## TODO
+This project is still in progress!
 
+After I wrote my first BitTorrent client in Ruby, I thought it would be fun(!) to write one in Clojure as well. 
 
-## Installation
-
-```
-lein deps
-```
-
-## Usage
-
-FIXME: explanation
-
-    $ java -jar clj_torrent-0.1.0-standalone.jar [args]
-
-## Options
-
-FIXME: listing of options this app accepts.
-
-## Examples
-
-...
-
-### Bugs
-
-...
-
-### Any Other Sections
-### That You Think
-### Might be Useful
-
-## License
-
-Copyright © 2014 FIXME
-
-Distributed under the Eclipse Public License either version 1.0 or (at
-your option) any later version.
+Features implemented:
+- Connecting to tracker over HTTP
+- Bencoding / decoding of handshake message
